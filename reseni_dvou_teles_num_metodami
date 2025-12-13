@@ -199,7 +199,7 @@ def verlet_integration(fun, t_span, y0, t_eval, args=()):
     return y
 
 # Zde můžete vybrat jednu z numerických metod
-numericka_metoda= verlet_integration
+numericka_metoda= euler_method
 numericka_metoda_jmeno= numericka_metoda.__name__
 #Řešení ODE
 solution= numericka_metoda(fun=system_ode,t_span=(time_s, time_e), y0= pocatecni_podminky, t_eval=t_points, args=(M1, M2))
