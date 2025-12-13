@@ -157,30 +157,49 @@ def symplectic_euler_method(fun, t_span, y0, t_eval=t_points, args=()):
 
 @measure_time
 def verlet_integration(fun, t_span, y0, t_eval, args=()):
+    n = len(y0) // 2          # počet souřadnic
     y = np.zeros((len(y0), len(t_eval)))
-    y[:,0] = y0
-    v0= fun(t_eval[0], y0, *args)  # počáteční rychlosti
+    y[:, 0] = y0
 
     h = t_eval[1] - t_eval[0]
+
+    # rozklad počátečního stavu
+    x0 = y0[:n]
+    v0 = y0[n:]
+
+    # zrychlení z ODE systému
     f0 = fun(t_eval[0], y0, *args)
+    a0 = f0[n:]
 
+    # první krok (Taylor)
+    x1 = x0 + h*v0 + 0.5*h**2 * a0
 
-    # první krok pomocí Taylorova rozvoje
-    y[:,1] = y0 + h*v0 + 0.5*h**2*f0
+    # uložení
+    y[:n, 1] = x1
+    y[n:, 1] = v0 + h * a0
 
-    # hlavní cyklus
     for i in range(1, len(t_eval)-1):
         h = t_eval[i+1] - t_eval[i]
-        t_n = t_eval[i]
-        y_n = y[:,i]
-        f_n = fun(t_n, y_n, *args)
-        y[:,i+1] = 2*y_n - y[:,i-1] + h**2*f_n
+
+        x_n = y[:n, i]
+        x_nm1 = y[:n, i-1]
+
+        y_full = y[:, i]
+        f_n = fun(t_eval[i], y_full, *args)
+        a_n = f_n[n:]
+
+        x_np1 = 2*x_n - x_nm1 + h**2 * a_n
+
+        # rychlosti (rekonstrukce)
+        v_n = (x_np1 - x_nm1) / (2*h)
+
+        y[:n, i+1] = x_np1
+        y[n:, i+1] = v_n
 
     return y
 
-
 # Zde můžete vybrat jednu z numerických metod
-numericka_metoda= backward_euler_method
+numericka_metoda= verlet_integration
 numericka_metoda_jmeno= numericka_metoda.__name__
 #Řešení ODE
 solution= numericka_metoda(fun=system_ode,t_span=(time_s, time_e), y0= pocatecni_podminky, t_eval=t_points, args=(M1, M2))
