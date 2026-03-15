@@ -3,7 +3,7 @@ import os
 import matplotlib.pyplot as plt
 import numpy as np
 import time
-from scipy.integrate import solve_ivp
+
 
  
 # Hmotnosti planet
@@ -64,7 +64,7 @@ def system_ode(t, S, M1, M2):
 
 #Numerické metody
 @measure_time
-def euler_method(fun, t_span, y0, t_eval=t_points, args=()):
+def euler_method(fun, y0, t_eval=t_points, args=()):
     y = np.zeros((len(y0), len(t_eval)))
     y[:, 0] = y0
 
@@ -79,7 +79,7 @@ def euler_method(fun, t_span, y0, t_eval=t_points, args=()):
     return y
 
 @measure_time
-def runge_kutta_4(fun, t_span, y0, t_eval=t_points, args=()):
+def runge_kutta_4(fun, y0, t_eval=t_points, args=()):
     y = np.zeros((len(y0), len(t_eval)))
     y[:, 0] = y0
 
@@ -98,7 +98,7 @@ def runge_kutta_4(fun, t_span, y0, t_eval=t_points, args=()):
     return y
 
 @measure_time
-def backward_euler_method(fun, t_span, y0, t_eval=t_points, args=(), tol=1e-6, max_iter=100):
+def backward_euler_method(fun, y0, t_eval=t_points, args=(), tol=1e-6, max_iter=100):
 
     y = np.zeros((len(y0), len(t_eval)))
     y[:, 0] = y0
@@ -125,7 +125,7 @@ def backward_euler_method(fun, t_span, y0, t_eval=t_points, args=(), tol=1e-6, m
     return y
 
 @measure_time
-def symplectic_euler_method(fun, t_span, y0, t_eval=t_points, args=()):
+def symplectic_euler_method(fun, y0, t_eval=t_points, args=()):
     y = np.zeros((len(y0), len(t_eval)))
     y[:, 0] = y0
 
@@ -156,7 +156,7 @@ def symplectic_euler_method(fun, t_span, y0, t_eval=t_points, args=()):
     return y
 
 @measure_time
-def verlet_integration(fun, t_span, y0, t_eval, args=()):
+def verlet_integration(fun, y0, t_eval, args=()):
     n = len(y0) // 2          # počet souřadnic
     y = np.zeros((len(y0), len(t_eval)))
     y[:, 0] = y0
@@ -202,7 +202,7 @@ def verlet_integration(fun, t_span, y0, t_eval, args=()):
 numericka_metoda= euler_method
 numericka_metoda_jmeno= numericka_metoda.__name__
 #Řešení ODE
-solution= numericka_metoda(fun=system_ode,t_span=(time_s, time_e), y0= pocatecni_podminky, t_eval=t_points, args=(M1, M2))
+solution= numericka_metoda(fun=system_ode, y0= pocatecni_podminky, t_eval=t_points, args=(M1, M2))
 
 t_sol= t_points
 p1x_sol, p1y_sol= solution[0], solution[1]
@@ -284,13 +284,13 @@ overeni_presnosti_energie(t_sol, pocatecni_rychlost_1, d)
 
 
 def overeni_presnosti_chyba(solution, t_points):
-    celkova_chyba_1 = np.zeros(len(t_points))  # pole pro chybu v každém časovém bodě
+    celkova_chyba_1 = np.zeros(len(t_points))  
     celkova_chyba_2 = np.zeros(len(t_points))
     chyba_v_procentech = np.zeros(len(t_points))
     for i, t in enumerate(t_points):
         t_period = (d/ v1)*np.pi
         ubehly_cas = t % t_period
-        uhel = pocatecni_rychlost_1[1] * ubehly_cas / (d * np.pi) * 360
+        uhel = v1 * ubehly_cas / (d * np.pi) * 360
         uhel_rad = np.deg2rad(uhel)
 
         presna_poloha_1 = np.array([d/2*np.cos(uhel_rad), d/2*np.sin(uhel_rad)])
@@ -316,5 +316,5 @@ def overeni_presnosti_chyba(solution, t_points):
     plt.grid()
     plt.show()
 
-# Zavolání funkce
+
 overeni_presnosti_chyba(solution, t_points)  
