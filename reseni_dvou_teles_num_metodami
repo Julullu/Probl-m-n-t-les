@@ -38,9 +38,9 @@ t_points= np.arange(time_s, time_e+velikost_kroku, velikost_kroku)
 def measure_time(func):
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
-        start_time = time.time()        # začátek měření
-        result = func(*args, **kwargs)  # volání funkce
-        end_time = time.time()          # konec měření
+        start_time = time.time()       
+        result = func(*args, **kwargs)  
+        end_time = time.time()          
         print(f"Funkce '{func.__name__}' běžela {end_time - start_time:.6f} s")
         return result
     return wrapper
@@ -157,13 +157,13 @@ def symplectic_euler_method(fun, y0, t_eval=t_points, args=()):
 
 @measure_time
 def verlet_integration(fun, y0, t_eval, args=()):
-    n = len(y0) // 2          # počet souřadnic
+    n = len(y0) // 2          
     y = np.zeros((len(y0), len(t_eval)))
     y[:, 0] = y0
 
     h = t_eval[1] - t_eval[0]
 
-    # rozklad počátečního stavu
+    
     x0 = y0[:n]
     v0 = y0[n:]
 
@@ -171,7 +171,7 @@ def verlet_integration(fun, y0, t_eval, args=()):
     f0 = fun(t_eval[0], y0, *args)
     a0 = f0[n:]
 
-    # první krok (Taylor)
+    # první krok
     x1 = x0 + h*v0 + 0.5*h**2 * a0
 
     # uložení
@@ -190,7 +190,7 @@ def verlet_integration(fun, y0, t_eval, args=()):
 
         x_np1 = 2*x_n - x_nm1 + h**2 * a_n
 
-        # rychlosti (rekonstrukce)
+        # rychlost
         v_n = (x_np1 - x_nm1) / (2*h)
 
         y[:n, i+1] = x_np1
@@ -270,7 +270,7 @@ def overeni_presnosti_energie(t_sol, pocatecni_rychlost_1, d):
     chyba_energie = np.abs(E - presna_energie)
     chyba_energie_procenta= (chyba_energie / np.abs(presna_energie)) * 100
 
-    # Vykreslení grafu
+    
     plt.figure()
     plt.plot(t_sol, chyba_energie_procenta, 'b')
     plt.xlabel("Čas")
@@ -279,7 +279,7 @@ def overeni_presnosti_energie(t_sol, pocatecni_rychlost_1, d):
     plt.grid()
     plt.show()
 
-# Zavolání funkce
+
 overeni_presnosti_energie(t_sol, pocatecni_rychlost_1, d)
 
 
