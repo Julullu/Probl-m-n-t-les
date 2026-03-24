@@ -134,22 +134,24 @@ def symplectic_euler_method(fun, y0, t_eval=t_points, args=()):
         t_n = t_eval[i-1]
         y_n = y[:, i-1]
 
-        # Rozdělení na pozice a rychlosti
+        
         p1, p2 = y_n[0:2], y_n[2:4]
         dp1_dt, dp2_dt = y_n[4:6], y_n[6:8]
 
-        # Aktualizace rychlostí
-        df1_dt = M2 * (p2 - p1) / np.linalg.norm(p2 - p1)**3
-        df2_dt = M1 * (p1 - p2) / np.linalg.norm(p1 - p2)**3
+        f0=fun(t_n, y_n, *args)
+
+        
+        df1_dt = f0[4:6]
+        df2_dt = f0[6:8]
 
         dp1_dt_new = dp1_dt + h * df1_dt
         dp2_dt_new = dp2_dt + h * df2_dt
 
-        # Aktualizace pozic
+        
         p1_new = p1 + h * dp1_dt_new
         p2_new = p2 + h * dp2_dt_new
 
-        # Uložení nových hodnot
+        
         y[:, i] = np.array([p1_new[0], p1_new[1], p2_new[0], p2_new[1],
                             dp1_dt_new[0], dp1_dt_new[1], dp2_dt_new[0], dp2_dt_new[1]])
 
@@ -167,7 +169,7 @@ def verlet_integration(fun, y0, t_eval, args=()):
     x0 = y0[:n]
     v0 = y0[n:]
 
-    # zrychlení z ODE systému
+    
     f0 = fun(t_eval[0], y0, *args)
     a0 = f0[n:]
 
@@ -190,7 +192,7 @@ def verlet_integration(fun, y0, t_eval, args=()):
 
         x_np1 = 2*x_n - x_nm1 + h**2 * a_n
 
-        # rychlost
+        
         v_n = (x_np1 - x_nm1) / (2*h)
 
         y[:n, i+1] = x_np1
@@ -253,7 +255,7 @@ def overeni_presnosti_energie(t_sol, pocatecni_rychlost_1, d):
     # Počáteční energie
     presna_energie = -M1*M2/d + 0.5*M1*(pocatecni_rychlost_1[1]**2) + 0.5*M2*(pocatecni_rychlost_1[1]**2)
 
-    # Pole pro energii v každém časovém bodě
+    
     E = np.zeros(len(t_sol))
 
     for i in range(len(t_sol)):
